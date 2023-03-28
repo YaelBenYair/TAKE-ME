@@ -100,22 +100,25 @@ class OpeningHours(models.Model):
 
     class Meta:
         db_table = 'opening_hours'
-
+#
     business = models.ForeignKey(Business, on_delete=models.CASCADE, null=False, blank=False)
-    sun_open = models.TimeField(db_column='sun_open', null=True, blank=True)
-    sun_close = models.TimeField(db_column='sun_close', null=True, blank=True)
-    mon_open = models.TimeField(db_column='mon_open', null=True, blank=True)
-    mon_close = models.TimeField(db_column='mon_close', null=True, blank=True)
-    tues_open = models.TimeField(db_column='tues_open', null=True, blank=True)
-    tues_close = models.TimeField(db_column='tues_close', null=True, blank=True)
-    wed_open = models.TimeField(db_column='wed_open', null=True, blank=True)
-    wed_close = models.TimeField(db_column='wed_close', null=True, blank=True)
-    thurs_open = models.TimeField(db_column='thurs_open', null=True, blank=True)
-    thurs_close = models.TimeField(db_column='thurs_close', null=True, blank=True)
-    fri_open = models.TimeField(db_column='fri_open', null=True, blank=True)
-    fri_close = models.TimeField(db_column='fri_close', null=True, blank=True)
-    sat_open = models.TimeField(db_column='sat_open', null=True, blank=True)
-    sat_close = models.TimeField(db_column='sat_close', null=True, blank=True)
+    day = models.SmallIntegerField(db_column='day', null=False, blank=False)
+    opening_time = models.TimeField(db_column='opening_time', null=False, blank=False)
+    closing_time = models.TimeField(db_column='closing_time', null=False, blank=False)
+#     sun_open = models.TimeField(db_column='sun_open', null=True, blank=True)
+#     sun_close = models.TimeField(db_column='sun_close', null=True, blank=True)
+#     mon_open = models.TimeField(db_column='mon_open', null=True, blank=True)
+#     mon_close = models.TimeField(db_column='mon_close', null=True, blank=True)
+#     tues_open = models.TimeField(db_column='tues_open', null=True, blank=True)
+#     tues_close = models.TimeField(db_column='tues_close', null=True, blank=True)
+#     wed_open = models.TimeField(db_column='wed_open', null=True, blank=True)
+#     wed_close = models.TimeField(db_column='wed_close', null=True, blank=True)
+#     thurs_open = models.TimeField(db_column='thurs_open', null=True, blank=True)
+#     thurs_close = models.TimeField(db_column='thurs_close', null=True, blank=True)
+#     fri_open = models.TimeField(db_column='fri_open', null=True, blank=True)
+#     fri_close = models.TimeField(db_column='fri_close', null=True, blank=True)
+#     sat_open = models.TimeField(db_column='sat_open', null=True, blank=True)
+#     sat_close = models.TimeField(db_column='sat_close', null=True, blank=True)
 
 
 class BusinessAndUser(models.Model):
