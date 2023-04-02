@@ -48,7 +48,7 @@ class Business(models.Model):
     description = models.TextField(db_column='description', null=True, blank=True)
     phone_num = models.IntegerField(db_column='phone_num', null=False, blank=False)  # TODO: add validation
     menu_url = models.URLField(db_column='menu_url', null=True, blank=True)
-    # logo = models.URLField()
+
     # TODO: To check whether I need to calculate the load hours or the client writes them,
     #  or if there is an option to leave it blank.
     load_hour = models.TimeField(db_column='load_hour', null=True, blank=True)
@@ -57,6 +57,8 @@ class Business(models.Model):
                                     default=0) # TODO: How can I automate a process where each time someone
                                     # TODO: views it, the view count increases by 1 automatically?
     is_active = models.BooleanField(db_column='is_active', null=False, blank=False, default=True)
+    # logo = models.URLField()
+    # bn_number =  # TODO: add bn_number
 
     business_types = models.ManyToManyField(BusinessType, through='BusinessAndType')
     users = models.ManyToManyField(User, through='BusinessAndUser', related_name='business')
@@ -129,6 +131,9 @@ class BusinessAndUser(models.Model):
 
     business = models.ForeignKey(Business, on_delete=models.CASCADE, null=False, blank=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=False, blank=False)
+
+    def __str__(self):
+        return self.business.name + " " + self.user.first_name
     # date?
 
 

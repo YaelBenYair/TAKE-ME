@@ -18,24 +18,16 @@ class BusinessSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'description', 'phone_num', 'menu_url', 'load_hour', 'user_name', 'address']
 
     def get_user_name(self, obj):
-        user = User.objects.get(pk=self.context['user_id'])
-        return user.first_name + user.last_name
+        # user = User.objects.get(pk=self.context['user_id'])
+        b = Business.objects.filter(id=obj.id).values_list('businessanduser__user__first_name',
+                                                           'businessanduser__user__last_name')
+        # user = BusinessAndUser.objects.get(business_id=obj.id)
+        # return obj.users.first_name + obj.users.last_name
+        return b[0][0] + " " + b[0][1]
 
     def get_address(self, obj):
         address = Address.objects.get(business_id=obj.id)
         return f"{address.city}, {address.street} {address.number}"
-
-
-
-# class CreateAddressSerializer(serializers.ModelSerializer):
-#
-#     class Meta:
-#         model = Address
-#         fields = ['city', 'street', 'number', 'zip_code', 'floor',
-#                   'apartment_num', 'is_business', 'user', 'business']
-#
-#     def create(self, validated_data):
-#         Address.objects.create(business=self.context['business'], **validated_data)
 
 
 class CreateAddressSerializer(serializers.ModelSerializer):
@@ -114,10 +106,6 @@ class CreateFullBusinessSerializer(serializers.ModelSerializer):
         # date_format = '%H:%M'
         for opening_hour_data in opening_hours_data:
             OpeningHours.objects.create(business=business, **opening_hour_data)
-        # for opening_hour_data in opening_hours_data:
-        #     OpeningHours.objects.create(business=business, day=opening_hour_data['day'],
-        #                                 opening_time=datetime.strptime(opening_hour_data['opening_time'], date_format),
-        #                                 closing_time=datetime.strptime(opening_hour_data['closing_time'], date_format))
 
         for business_type_data in business_and_types_data:
             BusinessAndType.objects.create(business=business, **business_type_data)

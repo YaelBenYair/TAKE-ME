@@ -9,7 +9,7 @@ class SignupSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('email', 'password', 'first_name', 'last_name')
+        fields = ('email', 'password', 'first_name', 'last_name', 'is_staff')
 
     email = serializers.EmailField(
         write_only=True,
@@ -43,6 +43,7 @@ class SignupSerializer(serializers.ModelSerializer):
             email=validated_data['email'],
             first_name=validated_data['first_name'],
             last_name=validated_data['last_name'],
+            is_staff=validated_data['is_staff']
         )
 
         # hash password

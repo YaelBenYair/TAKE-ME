@@ -7,7 +7,7 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 
-from take_me_app.views.auth import signup, me, UserViewSet
+from take_me_app.views.auth import *
 
 router = DefaultRouter()
 router.register('', UserViewSet)
@@ -17,6 +17,7 @@ urlpatterns = [
     path('token/', TokenObtainPairView.as_view()),
     path('token/refresh/', TokenRefreshView.as_view()),
     path('me/', me),
+    path('business/', user_business)
     # path('v1/stats', total)
 ]
 urlpatterns.extend(router.urls)
