@@ -10,5 +10,6 @@ router.register('', BusinessViewSet)
 
 urlpatterns = [
     # path('create/', create_business),
+    path('<int:business_id>/challenge/', create_business_challenge),
 ]
 urlpatterns.extend(router.urls)

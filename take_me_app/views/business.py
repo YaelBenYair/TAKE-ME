@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from rest_framework import status, mixins
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.pagination import PageNumberPagination
@@ -8,38 +8,14 @@ from rest_framework.viewsets import ModelViewSet, GenericViewSet
 
 from take_me_app.models import Business
 from take_me_app.serializers.business import BusinessSerializer, CreateAddressSerializer, \
-    CreateFullBusinessSerializer
+    CreateFullBusinessSerializer, CreateBusinessChallengeSerializer
 
 
 # Create your views here.
 
-# @api_view(['POST'])
-# def create_business(request):
-#     business_serializer = CreateBusinessSerializer(data=request.data, many=False)
-#     if business_serializer.is_valid():
-#         business = business_serializer.create(business_serializer.validated_data)
-#         address = CreateAddressSerializer(many=False, data=request.data, context={'business': business,
-#                                                                                  'request': request})
-#         # op_houer = CreateOpeningHours()
-#         if address.is_valid():
-#             address_value = address.create(address.validated_data)
-#         return Response(data=address.data)
-
-
-# @api_view(['POST'])
-# # @permission_classes([BusinessPermission])
-# def create_business(request):
-#     data_copy = request.data.copy()
-#     data_copy['user_id'] = request.user.id
-#     business_serializer = CreateFullBusinessSerializer(data=data_copy, partial=True)
-#     if business_serializer.is_valid(raise_exception=True):
-#         business_serializer.save()
-#         return Response()
-#     return Response(status=status.HTTP_400_BAD_REQUEST)
-
 
 class BusinessPaginationClass(PageNumberPagination):
-    page_size = 3
+    page_size = 15
 
 
 class BusinessPermission(BasePermission):
@@ -52,6 +28,7 @@ class BusinessPermission(BasePermission):
     def has_object_permission(self, request, view, obj):
         if request.method in ['PATCH', 'PUT']:
             return request.user.is_authenticated and request.user.id == obj.users.user_id
+        return True
 
 
 class BusinessCreateViewSet(mixins.CreateModelMixin,
@@ -64,12 +41,6 @@ class BusinessCreateViewSet(mixins.CreateModelMixin,
     serializer_class = CreateFullBusinessSerializer
 
     pagination_class = BusinessPaginationClass
-
-    def get_queryset(self):
-        qs = self.queryset
-        if self.action == 'list':
-            if 'name' in self.request.query_params:
-                qs = qs.filter(name__icontains=self.request.query_params['name'])
 
     def create(self, request, *args, **kwargs):
         data_copy = request.data.copy()
@@ -96,10 +67,40 @@ class BusinessViewSet(mixins.RetrieveModelMixin,
 
     serializer_class = BusinessSerializer
 
-    # pagination_class = BusinessPaginationClass
+    pagination_class = BusinessPaginationClass
 
-    # def get_queryset(self):
-    #     qs = self.queryset
-    #     if self.action == 'list':
-    #         if 'name' in self.request.query_params:
-    #             qs = qs.filter(name__icontains=self.request.query_params['name'])
+    def get_queryset(self):
+        qs = self.queryset
+        if self.action == 'list':
+            if 'name' in self.request.query_params:
+                qs = qs.filter(name__icontains=self.request.query_params['name'])
+        return qs
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.views_num += 1
+        instance.save()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
+
+@api_view(['POST', 'GET'])
+# @permission_classes([BusinessPermission])
+def business_challenge(request, business_id):
+    get_object_or_404(Business, id=business_id)
+
+    if request.method == 'POST':
+        business_serializer = CreateBusinessChallengeSerializer(data=request.data, many=False,
+                                                            context={'business_id': business_id, 'request': request})
+        if business_serializer.is_valid():
+            business = business_serializer.create(business_serializer.validated_data)
+
+        # op_houer = CreateOpeningHours()
+        # if address.is_valid():
+        #     address_value = address.create(address.validated_data)
+        # return Response(data=address.data)
+
+
+@api_view(['POST'])
+def create_business_challenge(request):
+    pass

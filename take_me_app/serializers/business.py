@@ -5,7 +5,8 @@ from rest_framework import serializers
 from rest_framework.serializers import Serializer
 from rest_framework.validators import UniqueValidator
 
-from take_me_app.models import Business, Address, OpeningHours, BusinessAndUser, BusinessAccessibility, BusinessAndType
+from take_me_app.models import Business, Address, OpeningHours, BusinessAndUser, BusinessAccessibility, BusinessAndType, \
+    Challenge, BusinessChallengeDetails
 
 
 class BusinessSerializer(serializers.ModelSerializer):
@@ -15,7 +16,8 @@ class BusinessSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Business
-        fields = ['id', 'name', 'description', 'phone_num', 'menu_url', 'load_hour', 'user_name', 'address']
+        fields = ['id', 'name', 'description', 'phone_num', 'menu_url', 'load_hour', 'user_name',
+                  'address', 'views_num']
 
     def get_user_name(self, obj):
         # user = User.objects.get(pk=self.context['user_id'])
@@ -111,4 +113,48 @@ class CreateFullBusinessSerializer(serializers.ModelSerializer):
             BusinessAndType.objects.create(business=business, **business_type_data)
 
         return business
+
+
+# user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+#     business = models.ForeignKey(Business, on_delete=models.CASCADE, null=False, blank=False)
+#     name = models.CharField(db_column='challenge_name', max_length=256, null=False, blank=False)
+#     challenge_type = models.ForeignKey(ChallengeType, on_delete=models.CASCADE, null=False, blank=False)
+#     date = models.DateField(db_column='date', null=True, blank=True)
+#     challenge_time = models.TimeField(db_column='challenge_time', null=False, blank=False)
+#     text_on_challenge = models.TextField(db_column='text_on_challenge', null=True, blank=True)
+#     is_business_challenge = models.BooleanField(db_column='is_business_challenge', null=False, blank=False)
+#
+#
+#     challenge = models.ForeignKey(Challenge, on_delete=models.CASCADE, null=False, blank=False)
+#     start_date = models.DateField(db_column='start_date', null=False,
+#                                   blank=False)  # check about auto field if I need to write false
+#     end_date = models.Date
+class ChallengeBusinessSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = BusinessChallengeDetails
+        fields = '__all__'
+
+
+class CreateBusinessChallengeSerializer(serializers.ModelSerializer):
+
+    business_challenge_detail = ChallengeBusinessSerializer(many=False)
+
+    class Meta:
+        model = Challenge
+        fields = ['name', 'challenge_type', 'date', 'challenge_time', 'text_on_challenge',
+                  'is_business_challenge', 'business_challenge_detail']
+
+    def create(self, validated_data):
+        b_challenge_d = validated_data.pop('business_challenge_detail')
+
+        b_challenge = Challenge.objects.create(business_id=self.context['business_id'], **validated_data)
+
+        BusinessChallengeDetails.objects.create(challenge=b_challenge, **b_challenge_d)
+
+        return b_challenge
+
+
+
+
 
