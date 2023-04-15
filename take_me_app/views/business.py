@@ -1,3 +1,7 @@
+import datetime
+import random
+
+from django.contrib.auth.models import AnonymousUser
 from django.shortcuts import render, get_object_or_404
 from rest_framework import status, mixins
 from rest_framework.decorators import api_view, permission_classes
@@ -6,9 +10,9 @@ from rest_framework.permissions import BasePermission
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 
-from take_me_app.models import Business
+from take_me_app.models import Business, Challenge
 from take_me_app.serializers.business import BusinessSerializer, CreateAddressSerializer, \
-    CreateFullBusinessSerializer, CreateBusinessChallengeSerializer
+    CreateFullBusinessSerializer, CreateBusinessChallengeSerializer, GetBusinessChallengeSerializer
 
 
 # Create your views here.
@@ -84,16 +88,29 @@ class BusinessViewSet(mixins.RetrieveModelMixin,
         return Response(serializer.data)
 
 
+def create_business_challenge(request, business_id):
+    business_ch_serializer = CreateBusinessChallengeSerializer(data=request.data, many=False,
+                                                               context={'business_id': business_id, 'request': request})
+    if business_ch_serializer.is_valid():
+        business_ch = business_ch_serializer.create(business_ch_serializer.validated_data)
+        return Response(data=business_ch_serializer.data)
+
+
+def get_business_challenge(request, business):
+    challenge = Challenge.objects.filter(busineess=business).\
+        filter(business_challenge_details__end_date__ltq=datetime.datetime.now())
+    GetBusinessChallengeSerializer()  # TODO: end the get business challenge
+
+
 @api_view(['POST', 'GET'])
 # @permission_classes([BusinessPermission])
 def business_challenge(request, business_id):
-    get_object_or_404(Business, id=business_id)
+    business = get_object_or_404(Business, id=business_id)
 
     if request.method == 'POST':
-        business_serializer = CreateBusinessChallengeSerializer(data=request.data, many=False,
-                                                            context={'business_id': business_id, 'request': request})
-        if business_serializer.is_valid():
-            business = business_serializer.create(business_serializer.validated_data)
+        return create_business_challenge(request, business_id)
+    if request.method == 'GET':
+        return get_business_challenge(request, business)
 
         # op_houer = CreateOpeningHours()
         # if address.is_valid():
@@ -101,6 +118,66 @@ def business_challenge(request, business_id):
         # return Response(data=address.data)
 
 
-@api_view(['POST'])
-def create_business_challenge(request):
+def anonymous_user_random():
+    business_list = Business.objects.all()
+    num = random.randint(0, len(business_list))
+    serializer = BusinessSerializer(business_list[num], many=False)
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
+def get_choose_me_business(request):
+
+    if isinstance(request.user, AnonymousUser):
+        print('AnonymousUser')
+        anonymous_user_random()
+    else:
+        # accessibility: list = get_user_accessibility(request) # TODO: write func
+        print(request.user.first_name)
+        business_list = Business.objects.all()
+        num = random.randint(0, len(business_list))
+        serializer = BusinessSerializer(business_list[num], many=False)
+        return Response(serializer.data)
     pass
+
+
+@api_view(['GET'])
+def get_challenge_me_business(request):
+    if isinstance(request.user, AnonymousUser):
+        print('AnonymousUser')
+        anonymous_user_random()
+    else:
+        business_list = Business.objects.all()
+        num = random.randint(0, len(business_list))
+        serializer = BusinessSerializer(business_list[num], many=False)
+        return Response(serializer.data)
+    pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

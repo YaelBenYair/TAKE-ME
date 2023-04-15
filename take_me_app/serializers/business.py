@@ -155,6 +155,16 @@ class CreateBusinessChallengeSerializer(serializers.ModelSerializer):
         return b_challenge
 
 
+class GetBusinessChallengeSerializer(serializers.ModelSerializer):
+
+    business_challenge_detail = ChallengeBusinessSerializer(many=False)
+
+    class Meta:
+        model = Challenge
+        fields = ['name', 'challenge_type', 'date', 'challenge_time', 'text_on_challenge',
+                  'is_business_challenge', 'business_challenge_detail']
+
+
 
 
 
