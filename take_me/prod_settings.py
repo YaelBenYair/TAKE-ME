@@ -13,7 +13,7 @@ import json
 from datetime import timedelta
 from pathlib import Path
 
-with open('D:\\Full_Stack_Python\\keys\\all_keys.json', 'r') as jsn:
+with open('/home/ubuntu/src/all_keys.json', 'r') as jsn:
     database_log = json.load(jsn)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
