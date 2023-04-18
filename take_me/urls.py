@@ -20,5 +20,5 @@ urlpatterns = [
     # path('admin/', admin.site.urls),
     path('api/auth/', include('take_me_app.urls.auth')),
     path('api/business/', include('take_me_app.urls.business')),
-#     path('api/challenge/', include('take_me_app.urls.challenge')),
+    # path('api/challenge/', include('take_me_app.urls.challenge')),
 ]
