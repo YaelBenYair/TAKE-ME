@@ -21,7 +21,8 @@ class BusinessAccessibility(models.Model):
     class Meta:
         db_table = 'business_accessibility'
 
-    business = models.ForeignKey('Business', on_delete=models.CASCADE, null=False, blank=False)
+    business = models.ForeignKey('Business', on_delete=models.CASCADE, null=False, blank=False,
+                                 related_name='accessibilities')
     is_free = models.BooleanField(db_column='is_free', null=False, blank=False)
     is_accessible = models.BooleanField(db_column='is_accessible',
                                         null=False, blank=False)  # is accessible for people with disabilities
@@ -75,8 +76,9 @@ class Address(models.Model):
         db_table = 'address'
         ordering = ['id']
 
-    business = models.ForeignKey(Business, on_delete=models.RESTRICT, null=True, blank=True)
-    user = models.ForeignKey(User, on_delete=models.RESTRICT, null=True, blank=True)
+    business = models.ForeignKey(Business, on_delete=models.RESTRICT, null=True, blank=True,
+                                 related_name='business_address')
+    user = models.ForeignKey(User, on_delete=models.RESTRICT, null=True, blank=True, related_name='user_address')
     city = models.CharField(db_column='city', max_length=256, null=False, blank=False, db_index=True)  # index = True
     street = models.CharField(db_column='street', max_length=256, null=False, blank=False)
     number = models.SmallIntegerField(db_column='number', null=False, blank=False)
@@ -103,24 +105,11 @@ class OpeningHours(models.Model):
     class Meta:
         db_table = 'opening_hours'
 #
-    business = models.ForeignKey(Business, on_delete=models.CASCADE, null=False, blank=False)
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, null=False, blank=False,
+                                 related_name='opening_hours')
     day = models.SmallIntegerField(db_column='day', null=False, blank=False)
     opening_time = models.TimeField(db_column='opening_time', null=False, blank=False)
     closing_time = models.TimeField(db_column='closing_time', null=False, blank=False)
-#     sun_open = models.TimeField(db_column='sun_open', null=True, blank=True)
-#     sun_close = models.TimeField(db_column='sun_close', null=True, blank=True)
-#     mon_open = models.TimeField(db_column='mon_open', null=True, blank=True)
-#     mon_close = models.TimeField(db_column='mon_close', null=True, blank=True)
-#     tues_open = models.TimeField(db_column='tues_open', null=True, blank=True)
-#     tues_close = models.TimeField(db_column='tues_close', null=True, blank=True)
-#     wed_open = models.TimeField(db_column='wed_open', null=True, blank=True)
-#     wed_close = models.TimeField(db_column='wed_close', null=True, blank=True)
-#     thurs_open = models.TimeField(db_column='thurs_open', null=True, blank=True)
-#     thurs_close = models.TimeField(db_column='thurs_close', null=True, blank=True)
-#     fri_open = models.TimeField(db_column='fri_open', null=True, blank=True)
-#     fri_close = models.TimeField(db_column='fri_close', null=True, blank=True)
-#     sat_open = models.TimeField(db_column='sat_open', null=True, blank=True)
-#     sat_close = models.TimeField(db_column='sat_close', null=True, blank=True)
 
 
 class BusinessAndUser(models.Model):
@@ -147,7 +136,7 @@ class Challenge(models.Model):
     business = models.ForeignKey(Business, on_delete=models.CASCADE, null=False, blank=False)
     name = models.CharField(db_column='challenge_name', max_length=256, null=False, blank=False)
     challenge_type = models.ForeignKey(ChallengeType, on_delete=models.CASCADE, null=False, blank=False)
-    date = models.DateField(db_column='date', null=True, blank=True)
+    date = models.DateField(db_column='date', null=True, blank=True)  # TODO: default date.now()
     challenge_time = models.TimeField(db_column='challenge_time', null=False, blank=False)
     text_on_challenge = models.TextField(db_column='text_on_challenge', null=True, blank=True)
     is_business_challenge = models.BooleanField(db_column='is_business_challenge', null=False, blank=False)
@@ -158,7 +147,8 @@ class BusinessChallengeDetails(models.Model):
     class Meta:
         db_table = 'business_challenge_details'
 
-    challenge = models.ForeignKey(Challenge, on_delete=models.CASCADE, null=False, blank=False)
+    challenge = models.ForeignKey(Challenge, on_delete=models.CASCADE, null=False, blank=False,
+                                  related_name='business_details')
     start_date = models.DateField(db_column='start_date', null=False,
                                   blank=False)  # check about auto field if I need to write false
     end_date = models.DateField(db_column='end_date', null=False,
@@ -198,7 +188,13 @@ class UserLike(models.Model):
     add_date = models.DateField(db_column='add_date', auto_now=True, null=False, blank=False)
 
 
+class UserProfile(models.Model):
 
+    class Meta:
+        db_table = 'user_profile'
+
+    user = models.OneToOneField(User, on_delete=models.RESTRICT)
+    profile_pic_url = models.CharField(max_length=1024, null=True, blank=True)
 
 
 

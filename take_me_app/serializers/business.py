@@ -13,23 +13,35 @@ class BusinessSerializer(serializers.ModelSerializer):
 
     user_name = serializers.SerializerMethodField('get_user_name')
     address = serializers.SerializerMethodField('get_address')
+    # business_accessibility = BusinessAccessibilitySerializer(many=False, read_only=True)
+    # business_accessibility = serializers.SerializerMethodField('get_business_accessibility')
 
     class Meta:
         model = Business
-        fields = ['id', 'name', 'description', 'phone_num', 'menu_url', 'load_hour', 'user_name',
-                  'address', 'views_num']
+        fields = ('id', 'name', 'description', 'phone_num', 'menu_url', 'load_hour', 'user_name',
+                  'address', 'views_num', 'accessibilities', 'opening_hours', 'business_types', 'business_address')
+        depth = 1
+        # extra_kwargs = {
+        #     'business_accessibility': {
+        #         'read_only': True
+        #     },
+        #     'address': {
+        #         'read_only': True
+        #     }
+        # }
 
     def get_user_name(self, obj):
-        # user = User.objects.get(pk=self.context['user_id'])
         b = Business.objects.filter(id=obj.id).values_list('businessanduser__user__first_name',
                                                            'businessanduser__user__last_name')
-        # user = BusinessAndUser.objects.get(business_id=obj.id)
-        # return obj.users.first_name + obj.users.last_name
         return b[0][0] + " " + b[0][1]
 
     def get_address(self, obj):
         address = Address.objects.get(business_id=obj.id)
         return f"{address.city}, {address.street} {address.number}"
+
+    def get_business_accessibility(self, obj):
+        business_accessibility = BusinessAccessibility.objects.get(business_id=obj.id)
+        return f"{business_accessibility}"
 
 
 class CreateAddressSerializer(serializers.ModelSerializer):
@@ -133,7 +145,7 @@ class ChallengeBusinessSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = BusinessChallengeDetails
-        fields = '__all__'
+        fields = ('start_date', 'end_date')
 
 
 class CreateBusinessChallengeSerializer(serializers.ModelSerializer):
@@ -157,12 +169,10 @@ class CreateBusinessChallengeSerializer(serializers.ModelSerializer):
 
 class GetBusinessChallengeSerializer(serializers.ModelSerializer):
 
-    business_challenge_detail = ChallengeBusinessSerializer(many=False)
-
     class Meta:
         model = Challenge
-        fields = ['name', 'challenge_type', 'date', 'challenge_time', 'text_on_challenge',
-                  'is_business_challenge', 'business_challenge_detail']
+        fields = ['id', 'name', 'challenge_type', 'date', 'challenge_time', 'text_on_challenge',
+                  'is_business_challenge', 'business_details']
 
 
 
