@@ -26,17 +26,17 @@ class BusinessPaginationClass(PageNumberPagination):
 class BusinessPermission(BasePermission):
 
     def has_permission(self, request, view):
-        # if request.method in ['POST']:
-        #     return request.user.is_authenticated and request.user.is_staff
         if request.method in ['POST']:
-            return False
+            return request.user.is_authenticated and request.user.is_staff
+        # if request.method in ['POST']:
+        #     return False
         return True
 
     def has_object_permission(self, request, view, obj):
-        if request.method in ['POST']:
-            return False
+        # if request.method in ['POST']:
+        #     return False
         if request.method in ['PATCH', 'PUT']:
-            print(request.user.id)
+            # print(request.user.id)
             return request.user.is_authenticated and \
                    Business.objects.filter(users=request.user.id).filter(pk=obj.id).exists()
         return True
@@ -47,7 +47,7 @@ class BusinessChallengePermission(BasePermission):
     def has_permission(self, request, view):
 
         if request.method in ['POST']:
-            print(request.user.id, "in has_permission", request)
+            # print(request.user.id, "in has_permission", request)
             return request.user.is_authenticated and request.user.is_staff and \
                    Business.objects.filter(users=request.user.id).\
                        filter(pk=request.parser_context["kwargs"]["pk"]).exists()
@@ -55,36 +55,13 @@ class BusinessChallengePermission(BasePermission):
 
     def has_object_permission(self, request, view, obj):
         if request.method in ['PATCH', 'PUT', 'POST']:
-            print(request.user.id)
+            # print(request.user.id)
             # return request.user.is_authenticated and \
             #        obj.id == Business.objects.filter(users=request.user.id).filter(pk=obj.id)[0]
             return request.user.is_authenticated and \
                    Business.objects.filter(users=request.user.id).filter(pk=obj.id).exists()
         return True
 
-
-# class BusinessCreateViewSet(mixins.CreateModelMixin, GenericViewSet):
-#
-#     queryset = Business.objects.all()
-#
-#     permission_classes = [BusinessPermission]
-#
-#     serializer_class = CreateFullBusinessSerializer
-#
-#     pagination_class = BusinessPaginationClass
-#
-#     def create(self, request, *args, **kwargs):
-#         data_copy = request.data.copy()
-#         data_copy['user_id'] = request.user.id
-#         print(data_copy)
-#         serializer = self.get_serializer(data=data_copy, partial=True)
-#         serializer.is_valid(raise_exception=True)
-#         business = serializer.save()
-#         # self.perform_create(serializer)
-#         # headers = self.get_success_headers(serializer.data)
-#         response_serializer = BusinessSerializer(business, context={'request': request,
-#                                                                     'user_id': data_copy['user_id']})
-#         return Response(response_serializer.data, status=status.HTTP_201_CREATED)
 
 # ----------------------------------------------------------------------------------------------------------------------
 class BusinessViewSet(mixins.CreateModelMixin,
@@ -107,6 +84,21 @@ class BusinessViewSet(mixins.CreateModelMixin,
             if 'name' in self.request.query_params:
                 qs = qs.filter(name__icontains=self.request.query_params['name'])
         return qs
+
+    def create(self, request, *args, **kwargs):
+
+        data_copy = request.data.copy()
+        data_copy['user_id'] = request.user.id
+        print(data_copy)
+        serializer = CreateFullBusinessSerializer(data=data_copy, partial=True)  # TODO: fix the partial!
+        # TODO Instead of writing "__all__" in the serializer, need to write what I want to receive without the id of the business
+        serializer.is_valid(raise_exception=True)
+        business = serializer.save()
+        # self.perform_create(serializer)
+        # headers = self.get_success_headers(serializer.data)
+        response_serializer = BusinessSerializer(business, context={'request': request,
+                                                                    'user_id': data_copy['user_id']})
+        return Response(response_serializer.data, status=status.HTTP_201_CREATED)
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -152,18 +144,18 @@ class BusinessViewSet(mixins.CreateModelMixin,
 # ----------------------------------------------------------------------------------------------------------------------
 
 
-@api_view(['POST'])
-@permission_classes([IsAuthenticated, IsAdminUser])
-def create_business(request):
-    data_copy = request.data.copy()
-    data_copy['user_id'] = request.user.id
-    print(data_copy)
-    serializer = CreateFullBusinessSerializer(data=data_copy, partial=True)
-    serializer.is_valid(raise_exception=True)
-    business = serializer.save()
-    response_serializer = BusinessSerializer(business, context={'request': request,
-                                                                'user_id': data_copy['user_id']})
-    return Response(response_serializer.data, status=status.HTTP_201_CREATED)
+# @api_view(['POST'])
+# @permission_classes([IsAuthenticated, IsAdminUser])
+# def create_business(request):
+#     data_copy = request.data.copy()
+#     data_copy['user_id'] = request.user.id
+#     print(data_copy)
+#     serializer = CreateFullBusinessSerializer(data=data_copy, partial=True)
+#     serializer.is_valid(raise_exception=True)
+#     business = serializer.save()
+#     response_serializer = BusinessSerializer(business, context={'request': request,
+#                                                                 'user_id': data_copy['user_id']})
+#     return Response(response_serializer.data, status=status.HTTP_201_CREATED)
 
 @api_view(['POST'])
 def create_business_challenge(request, business_id):

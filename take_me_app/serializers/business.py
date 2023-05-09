@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from django.contrib.auth.models import User
+from django.db import transaction
 from rest_framework import serializers
 from rest_framework.serializers import Serializer
 from rest_framework.validators import UniqueValidator
@@ -13,8 +14,7 @@ class BusinessSerializer(serializers.ModelSerializer):
 
     user_name = serializers.SerializerMethodField('get_user_name')
     address = serializers.SerializerMethodField('get_address')
-    # business_accessibility = BusinessAccessibilitySerializer(many=False, read_only=True)
-    # business_accessibility = serializers.SerializerMethodField('get_business_accessibility')
+    # accessibilities = serializers.StringRelatedField(many=False)
 
     class Meta:
         model = Business
@@ -22,10 +22,10 @@ class BusinessSerializer(serializers.ModelSerializer):
                   'address', 'views_num', 'accessibilities', 'opening_hours', 'business_types', 'business_address')
         depth = 1
         # extra_kwargs = {
-        #     'business_accessibility': {
+        #     'accessibilities': {
         #         'read_only': True
         #     },
-        #     'address': {
+        #     'opening_hours': {
         #         'read_only': True
         #     }
         # }
@@ -101,30 +101,31 @@ class CreateFullBusinessSerializer(serializers.ModelSerializer):
                   'opening_hours', 'business_and_type', 'business_accessibility']
 
     def create(self, validated_data):
-        print("in create", validated_data)
-        address_data = validated_data.pop('address')
-        opening_hours_data = validated_data.pop('opening_hours')
-        user_id_data = validated_data.pop('user_id')
-        business_and_types_data = validated_data.pop('business_and_type')
-        # business_and_user_data = validated_data.pop('business_and_user')
-        business_accessibility_data = validated_data.pop('business_accessibility')
+        with transaction.atomic():
 
-        print("after pop", validated_data)
+            address_data = validated_data.pop('address')
+            opening_hours_data = validated_data.pop('opening_hours')
+            user_id_data = validated_data.pop('user_id')
+            business_and_types_data = validated_data.pop('business_and_type')
+            # business_and_user_data = validated_data.pop('business_and_user')
+            business_accessibility_data = validated_data.pop('business_accessibility')
 
-        business = Business.objects.create(**validated_data)
+            print("after pop", validated_data)
 
-        Address.objects.create(business=business, **address_data)
-        BusinessAndUser.objects.create(business=business, user_id=user_id_data)
-        BusinessAccessibility.objects.create(business=business, **business_accessibility_data)
+            business = Business.objects.create(**validated_data)
 
-        # date_format = '%H:%M'
-        for opening_hour_data in opening_hours_data:
-            OpeningHours.objects.create(business=business, **opening_hour_data)
+            Address.objects.create(business=business, **address_data)
+            BusinessAndUser.objects.create(business=business, user_id=user_id_data)
+            BusinessAccessibility.objects.create(business=business, **business_accessibility_data)
 
-        for business_type_data in business_and_types_data:
-            BusinessAndType.objects.create(business=business, **business_type_data)
+            # date_format = '%H:%M'
+            for opening_hour_data in opening_hours_data:
+                OpeningHours.objects.create(business=business, **opening_hour_data)
 
-        return business
+            for business_type_data in business_and_types_data:
+                BusinessAndType.objects.create(business=business, **business_type_data)
+
+            return business
 
 
 # user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
@@ -158,13 +159,14 @@ class CreateBusinessChallengeSerializer(serializers.ModelSerializer):
                   'is_business_challenge', 'business_challenge_detail']
 
     def create(self, validated_data):
-        b_challenge_d = validated_data.pop('business_challenge_detail')
+        with transaction.atomic():
+            b_challenge_d = validated_data.pop('business_challenge_detail')
 
-        b_challenge = Challenge.objects.create(business_id=self.context['business_id'], **validated_data)
+            b_challenge = Challenge.objects.create(business_id=self.context['business_id'], **validated_data)
 
-        BusinessChallengeDetails.objects.create(challenge=b_challenge, **b_challenge_d)
+            BusinessChallengeDetails.objects.create(challenge=b_challenge, **b_challenge_d)
 
-        return b_challenge
+            return b_challenge
 
 
 class GetBusinessChallengeSerializer(serializers.ModelSerializer):
