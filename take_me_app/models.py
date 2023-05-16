@@ -47,7 +47,7 @@ class Business(models.Model):
 
     name = models.CharField(db_column='name', max_length=64, null=False, blank=False, db_index=True)  # index = True
     description = models.TextField(db_column='description', null=True, blank=True)
-    phone_num = models.IntegerField(db_column='phone_num', null=False, blank=False)  # TODO: add validation
+    phone_num = models.IntegerField(db_column='phone_num', null=True, blank=True)  # TODO: add validation
     menu_url = models.URLField(db_column='menu_url', null=True, blank=True)
 
     # TODO: To check whether I need to calculate the load hours or the client writes them,
@@ -58,7 +58,8 @@ class Business(models.Model):
                                     default=0) # TODO: How can I automate a process where each time someone
                                     # TODO: views it, the view count increases by 1 automatically?
     is_active = models.BooleanField(db_column='is_active', null=False, blank=False, default=True)
-    # logo = models.URLField()
+    logo = models.URLField(db_column='logo_url', null=True, blank=True)
+    cover = models.URLField(db_column='cover_url', null=True, blank=True)
     # bn_number =  # TODO: add bn_number
 
     business_types = models.ManyToManyField(BusinessType, through='BusinessAndType')
@@ -195,6 +196,7 @@ class UserProfile(models.Model):
 
     user = models.OneToOneField(User, on_delete=models.RESTRICT)
     profile_pic_url = models.CharField(max_length=1024, null=True, blank=True)
+    is_google_login = models.BooleanField(db_column='is_google_login', null=True, blank=True)
 
 
 

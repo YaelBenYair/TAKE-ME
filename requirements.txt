@@ -1,7 +1,11 @@
 psycopg2
-django
-djangorestframework
+django~=4.1.7
+djangorestframework~=3.14.0
 django-cors-headers
 djangorestframework-simplejwt
 django-environ
 django-filter
+gunicorn
+boto3
+google-auth
+

@@ -18,7 +18,7 @@ class BusinessSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Business
-        fields = ('id', 'name', 'description', 'phone_num', 'menu_url', 'load_hour', 'user_name',
+        fields = ('id', 'name', 'description', 'phone_num', 'menu_url', 'logo', 'cover', 'load_hour', 'user_name',
                   'address', 'views_num', 'accessibilities', 'opening_hours', 'business_types', 'business_address')
         depth = 1
         # extra_kwargs = {
@@ -97,7 +97,7 @@ class CreateFullBusinessSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Business
-        fields = ['name', 'description', 'phone_num', 'menu_url', 'load_hour', 'user_id', 'address',
+        fields = ['name', 'description', 'phone_num', 'menu_url', 'load_hour', 'user_id', 'logo', 'cover', 'address',
                   'opening_hours', 'business_and_type', 'business_accessibility']
 
     def create(self, validated_data):

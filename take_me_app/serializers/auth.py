@@ -1,8 +1,10 @@
 from django.contrib.auth.models import User
+from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 from rest_framework.serializers import Serializer
 from rest_framework.validators import UniqueValidator
 
+from take_me_app.models import UserProfile
 
 
 class SignupSerializer(serializers.ModelSerializer):
@@ -20,7 +22,8 @@ class SignupSerializer(serializers.ModelSerializer):
         write_only=True,
         required=True,
         allow_null=False,
-        allow_blank=False
+        allow_blank=False,
+        validators=[validate_password]
     )
 
     first_name = serializers.CharField(
@@ -59,13 +62,22 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('email', 'first_name', 'last_name', 'id', 'userprofile', 'user_address')
+        fields = ('email', 'first_name', 'last_name', 'id', 'userprofile',
+                  'user_address', 'is_staff', 'is_superuser')
         depth = 1
         extra_kwargs = {
             'userprofile': {
                 'read_only': True
             }
         }
+
+
+class UserprofileSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = UserProfile
+        fields = ('user', 'profile_pic_url', 'is_google_login')
+
 
 
 

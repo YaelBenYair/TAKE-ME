@@ -17,7 +17,8 @@ urlpatterns = [
     path('token/', TokenObtainPairView.as_view()),
     path('token/refresh/', TokenRefreshView.as_view()),
     path('me/', me),
-    path('business/', user_business)
+    path('business/', user_business),
+    path('google-auth/', google_auth)
     # path('v1/stats', total)
 ]
 urlpatterns.extend(router.urls)
