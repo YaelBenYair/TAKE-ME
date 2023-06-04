@@ -14,34 +14,24 @@ class BusinessSerializer(serializers.ModelSerializer):
 
     user_name = serializers.SerializerMethodField('get_user_name')
     address = serializers.SerializerMethodField('get_address')
-    # accessibilities = serializers.StringRelatedField(many=False)
 
     class Meta:
         model = Business
         fields = ('id', 'name', 'description', 'phone_num', 'menu_url', 'logo', 'cover', 'load_hour', 'user_name',
-                  'address', 'views_num', 'accessibilities', 'opening_hours', 'business_types', 'business_address')
+                  'address', 'views_num', 'accessibilities', 'opening_hours', 'business_types', 'business_address',
+                  'challenge_set')
         depth = 1
-        # extra_kwargs = {
-        #     'accessibilities': {
-        #         'read_only': True
-        #     },
-        #     'opening_hours': {
-        #         'read_only': True
-        #     }
-        # }
 
-    def get_user_name(self, obj):
+    @staticmethod
+    def get_user_name(obj):
         b = Business.objects.filter(id=obj.id).values_list('businessanduser__user__first_name',
                                                            'businessanduser__user__last_name')
         return b[0][0] + " " + b[0][1]
 
-    def get_address(self, obj):
+    @staticmethod
+    def get_address(obj):
         address = Address.objects.get(business_id=obj.id)
         return f"{address.city}, {address.street} {address.number}"
-
-    def get_business_accessibility(self, obj):
-        business_accessibility = BusinessAccessibility.objects.get(business_id=obj.id)
-        return f"{business_accessibility}"
 
 
 class CreateAddressSerializer(serializers.ModelSerializer):
@@ -142,39 +132,6 @@ class CreateFullBusinessSerializer(serializers.ModelSerializer):
 #     start_date = models.DateField(db_column='start_date', null=False,
 #                                   blank=False)  # check about auto field if I need to write false
 #     end_date = models.Date
-class ChallengeBusinessSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = BusinessChallengeDetails
-        fields = ('start_date', 'end_date')
-
-
-class CreateBusinessChallengeSerializer(serializers.ModelSerializer):
-
-    business_challenge_detail = ChallengeBusinessSerializer(many=False)
-
-    class Meta:
-        model = Challenge
-        fields = ['name', 'challenge_type', 'date', 'challenge_time', 'text_on_challenge',
-                  'is_business_challenge', 'business_challenge_detail']
-
-    def create(self, validated_data):
-        with transaction.atomic():
-            b_challenge_d = validated_data.pop('business_challenge_detail')
-
-            b_challenge = Challenge.objects.create(business_id=self.context['business_id'], **validated_data)
-
-            BusinessChallengeDetails.objects.create(challenge=b_challenge, **b_challenge_d)
-
-            return b_challenge
-
-
-class GetBusinessChallengeSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Challenge
-        fields = ['id', 'name', 'challenge_type', 'date', 'challenge_time', 'text_on_challenge',
-                  'is_business_challenge', 'business_details']
 
 
 

@@ -81,8 +81,8 @@ class Address(models.Model):
                                  related_name='business_address')
     user = models.ForeignKey(User, on_delete=models.RESTRICT, null=True, blank=True, related_name='user_address')
     city = models.CharField(db_column='city', max_length=256, null=False, blank=False, db_index=True)  # index = True
-    street = models.CharField(db_column='street', max_length=256, null=False, blank=False)
-    number = models.SmallIntegerField(db_column='number', null=False, blank=False)
+    street = models.CharField(db_column='street', max_length=256, null=True, blank=True)
+    number = models.SmallIntegerField(db_column='number', null=True, blank=True)
     zip_code = models.IntegerField(db_column='zip_code', null=True, blank=True)
     floor = models.SmallIntegerField(db_column='floor', null=True, blank=True)
     apartment_num = models.SmallIntegerField(db_column='apartment_num', null=True, blank=True)
@@ -161,10 +161,12 @@ class WhoToChallenge(models.Model):
     class Meta:
         db_table = 'who_to_challenge'
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=False, blank=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=False, blank=False, related_name='accepts_challenge')
     challenge = models.ForeignKey(Challenge, on_delete=models.CASCADE, null=False, blank=False)
-    answer = models.BooleanField(db_column='answer', null=False, blank=False)
-    # who_challenge = models.ForeignKey(User, on_delete=models.CASCADE, null=False, blank=False)  # TODO:???????????
+    answer = models.BooleanField(db_column='answer', null=True, blank=True)
+    who_challenge = models.ForeignKey(User, on_delete=models.CASCADE, null=False, blank=False,
+                                      related_name='Sender_challenge')
+    is_read = models.BooleanField(db_column='is_read', default=False)
 
 
 class UserViewHistory(models.Model):
@@ -197,6 +199,7 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.RESTRICT)
     profile_pic_url = models.CharField(max_length=1024, null=True, blank=True)
     is_google_login = models.BooleanField(db_column='is_google_login', null=True, blank=True)
+
 
 
 

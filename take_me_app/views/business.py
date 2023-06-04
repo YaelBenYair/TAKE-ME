@@ -13,7 +13,7 @@ from rest_framework.decorators import action
 
 from take_me_app.models import Business, Challenge
 from take_me_app.serializers.business import BusinessSerializer, CreateAddressSerializer, \
-    CreateFullBusinessSerializer, CreateBusinessChallengeSerializer, GetBusinessChallengeSerializer
+    CreateFullBusinessSerializer
 
 
 # Create your views here.
@@ -89,7 +89,7 @@ class BusinessViewSet(mixins.CreateModelMixin,
 
         data_copy = request.data.copy()
         data_copy['user_id'] = request.user.id
-        print(data_copy)
+        # print(data_copy)
         serializer = CreateFullBusinessSerializer(data=data_copy, partial=True)  # TODO: fix the partial!
         # TODO Instead of writing "__all__" in the serializer, need to write what I want to receive without the id of the business
         serializer.is_valid(raise_exception=True)
@@ -107,16 +107,16 @@ class BusinessViewSet(mixins.CreateModelMixin,
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
 
-    @action(detail=True, methods=['post'], permission_classes=[BusinessChallengePermission])
-    def challenge(self, request, pk=None):
-        # business = self.get_object()
-        serializer = CreateBusinessChallengeSerializer(data=request.data, many=False,
-                                                       context={'business_id': pk, 'request': request})
-        if serializer.is_valid(raise_exception=True):
-            business_ch = serializer.create(serializer.validated_data)
-            view_business_ch = GetBusinessChallengeSerializer(business_ch, many=False)
-            return Response(data=view_business_ch.data)
-        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    # @action(detail=True, methods=['post'], permission_classes=[BusinessChallengePermission])
+    # def challenge(self, request, pk=None):
+    #     # business = self.get_object()
+    #     serializer = CreateBusinessChallengeSerializer(data=request.data, many=False,
+    #                                                    context={'business_id': pk, 'request': request})
+    #     if serializer.is_valid(raise_exception=True):
+    #         business_ch = serializer.create(serializer.validated_data)
+    #         view_business_ch = GetBusinessChallengeSerializer(business_ch, many=False)
+    #         return Response(data=view_business_ch.data)
+    #     return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 # class BusinessChallengeViewSet(ModelViewSet):
@@ -157,21 +157,21 @@ class BusinessViewSet(mixins.CreateModelMixin,
 #                                                                 'user_id': data_copy['user_id']})
 #     return Response(response_serializer.data, status=status.HTTP_201_CREATED)
 
-@api_view(['POST'])
-def create_business_challenge(request, business_id):
-    business_ch_serializer = CreateBusinessChallengeSerializer(data=request.data, many=False,
-                                                               context={'business_id': business_id, 'request': request})
-    if business_ch_serializer.is_valid(raise_exception=True):
-        business_ch = business_ch_serializer.create(business_ch_serializer.validated_data)
-        view_business_ch = GetBusinessChallengeSerializer(business_ch, many=False)
-        return Response(data=view_business_ch.data)
-    return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
-def get_business_challenge(request, business):
-    challenge = Challenge.objects.filter(busineess=business).\
-        filter(business_challenge_details__end_date__ltq=datetime.datetime.now())
-    GetBusinessChallengeSerializer()  # TODO: end the get business challenge
+# @api_view(['POST'])
+# def create_business_challenge(request, business_id):
+#     business_ch_serializer = CreateBusinessChallengeSerializer(data=request.data, many=False,
+#                                                                context={'business_id': business_id, 'request': request})
+#     if business_ch_serializer.is_valid(raise_exception=True):
+#         business_ch = business_ch_serializer.create(business_ch_serializer.validated_data)
+#         view_business_ch = GetBusinessChallengeSerializer(business_ch, many=False)
+#         return Response(data=view_business_ch.data)
+#     return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+#
+#
+# def get_business_challenge(request, business):
+#     challenge = Challenge.objects.filter(busineess=business).\
+#         filter(business_challenge_details__end_date__ltq=datetime.datetime.now())
+#     GetBusinessChallengeSerializer()  # TODO: end the get business challenge
 
 
 @api_view(['POST', 'GET'])
