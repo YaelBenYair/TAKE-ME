@@ -150,8 +150,8 @@ class BusinessChallengeDetails(models.Model):
 
     challenge = models.ForeignKey(Challenge, on_delete=models.CASCADE, null=False, blank=False,
                                   related_name='business_details')
-    start_date = models.DateField(db_column='start_date', null=False,
-                                  blank=False)  # check about auto field if I need to write false
+    # start_date = models.DateField(db_column='start_date', null=False,
+    #                               blank=False)  # check about auto field if I need to write false
     end_date = models.DateField(db_column='end_date', null=False,
                                 blank=False)  # check about auto field if I need to write false
 
@@ -162,7 +162,7 @@ class WhoToChallenge(models.Model):
         db_table = 'who_to_challenge'
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=False, blank=False, related_name='accepts_challenge')
-    challenge = models.ForeignKey(Challenge, on_delete=models.CASCADE, null=False, blank=False)
+    challenge = models.ForeignKey(Challenge, on_delete=models.CASCADE, null=False, blank=False, related_name='who_challenged')
     answer = models.BooleanField(db_column='answer', null=True, blank=True)
     who_challenge = models.ForeignKey(User, on_delete=models.CASCADE, null=False, blank=False,
                                       related_name='Sender_challenge')

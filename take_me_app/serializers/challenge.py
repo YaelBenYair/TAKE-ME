@@ -6,14 +6,14 @@ from rest_framework import serializers
 from rest_framework.serializers import Serializer
 from rest_framework.validators import UniqueValidator
 
-from take_me_app.models import Challenge, BusinessChallengeDetails, WhoToChallenge
+from take_me_app.models import Challenge, BusinessChallengeDetails, WhoToChallenge, ChallengeType
 
 
 class ChallengeBusinessSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = BusinessChallengeDetails
-        fields = ('start_date', 'end_date')
+        fields = ['end_date']
 
 
 class CreateBusinessChallengeSerializer(serializers.ModelSerializer):
@@ -41,7 +41,7 @@ class GetBusinessChallengeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Challenge
-        fields = ['id', 'name', 'challenge_type', 'date', 'challenge_time', 'text_on_challenge',
+        fields = ['id', 'name', 'business_id', 'challenge_type', 'date', 'challenge_time', 'text_on_challenge',
                   'is_business_challenge', 'business_details']
         depth = 1
 
@@ -53,12 +53,6 @@ class CreateUserChallengeSerializer(serializers.ModelSerializer):
         fields = ['user', 'business', 'name', 'challenge_type', 'date', 'challenge_time', 'text_on_challenge',
                   'is_business_challenge']
 
-# ser = models.ForeignKey(User, on_delete=models.CASCADE, null=False, blank=False, related_name='accepts_challenge')
-#     challenge = models.ForeignKey(Challenge, on_delete=models.CASCADE, null=False, blank=False)
-#     answer = models.BooleanField(db_column='answer', null=False, blank=False)
-#     who_challenge = models.ForeignKey(User, on_delete=models.CASCADE, null=False, blank=False,
-#                                       related_name='Sender_challenge')
-#     is_read
 
 class WhoToChallengeSerializer(serializers.ModelSerializer):
 
@@ -68,12 +62,26 @@ class WhoToChallengeSerializer(serializers.ModelSerializer):
 
 
 class GetUserChallengeSerializer(serializers.ModelSerializer):
+    user_name = serializers.SerializerMethodField('get_user_name')
 
     class Meta:
         model = Challenge
-        fields = ['id', 'name', 'challenge_type', 'date', 'challenge_time', 'text_on_challenge',
-                  'is_business_challenge']
+        fields = ['id', 'user_id', 'user_name', 'name', 'challenge_type', 'date', 'challenge_time', 'text_on_challenge',
+                  'is_business_challenge', 'who_challenged']
         depth = 1
+
+    @staticmethod
+    def get_user_name(obj):
+        b = Challenge.objects.filter(id=obj.id).values_list('user__first_name',
+                                                           'user__last_name')
+        return b[0][0] + " " + b[0][1]
+
+
+class ChallengeTypeSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ChallengeType
+        fields = '__all__'
 
 
 

@@ -174,15 +174,15 @@ class BusinessViewSet(mixins.CreateModelMixin,
 #     GetBusinessChallengeSerializer()  # TODO: end the get business challenge
 
 
-@api_view(['POST', 'GET'])
-# @permission_classes([BusinessPermission])
-def business_challenge(request, business_id):
-    business = get_object_or_404(Business, id=business_id)
-
-    if request.method == 'POST':
-        return create_business_challenge(request, business_id)
-    if request.method == 'GET':
-        return get_business_challenge(request, business)
+# @api_view(['POST', 'GET'])
+# # @permission_classes([BusinessPermission])
+# def business_challenge(request, business_id):
+#     business = get_object_or_404(Business, id=business_id)
+#
+#     if request.method == 'POST':
+#         return create_business_challenge(request, business_id)
+#     if request.method == 'GET':
+#         return get_business_challenge(request, business)
 
 
 

@@ -10,16 +10,27 @@ from take_me_app.models import Business, Address, OpeningHours, BusinessAndUser,
     Challenge, BusinessChallengeDetails
 
 
+class ChallengeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Challenge
+        fields = ['id', 'name', 'challenge_type', 'date', 'challenge_time', 'text_on_challenge',
+                  'is_business_challenge', 'business_details']
+        depth = 1
+
+
 class BusinessSerializer(serializers.ModelSerializer):
 
     user_name = serializers.SerializerMethodField('get_user_name')
     address = serializers.SerializerMethodField('get_address')
+    # challenge_set = serializers.PrimaryKeyRelatedField(many=True,
+    #                                                 queryset=Challenge.objects.filter(is_business_challenge=True))
+    challenges = serializers.SerializerMethodField('get_challenges')
 
     class Meta:
         model = Business
         fields = ('id', 'name', 'description', 'phone_num', 'menu_url', 'logo', 'cover', 'load_hour', 'user_name',
                   'address', 'views_num', 'accessibilities', 'opening_hours', 'business_types', 'business_address',
-                  'challenge_set')
+                  'challenges')
         depth = 1
 
     @staticmethod
@@ -32,6 +43,11 @@ class BusinessSerializer(serializers.ModelSerializer):
     def get_address(obj):
         address = Address.objects.get(business_id=obj.id)
         return f"{address.city}, {address.street} {address.number}"
+
+    def get_challenges(self, obj):
+        business_challenges = obj.challenge_set.filter(is_business_challenge=True)
+        serializer = ChallengeSerializer(business_challenges, many=True)
+        return serializer.data
 
 
 class CreateAddressSerializer(serializers.ModelSerializer):

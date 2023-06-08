@@ -79,6 +79,12 @@ class UserprofileSerializer(serializers.ModelSerializer):
         fields = ('user', 'profile_pic_url', 'is_google_login')
 
 
+# class EmailCheckSerializer(serializers.ModelSerializer):
+#
+#     class Meta:
+#         model = User
+#         fields = ['email']
+
 
 
 

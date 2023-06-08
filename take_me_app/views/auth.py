@@ -95,6 +95,13 @@ def me(request):
 
 
 @api_view(['GET'])
+def check_email_exists(request):
+    return Response(data={
+        'email_exists': User.objects.filter(email=request.query_params['email']).exists()
+    })
+
+
+@api_view(['GET'])
 @permission_classes([IsAuthenticated, IsAdminUser])
 def user_business(request, page=None):
     """
