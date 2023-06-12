@@ -8,4 +8,24 @@ django-filter
 gunicorn
 boto3
 google-auth
+asgiref==3.6.0
+botocore==1.29.135
+cachetools==5.3.0
+certifi==2023.5.7
+charset-normalizer==3.1.0
+idna==3.4
+jmespath==1.0.1
+pyasn1==0.5.0
+pyasn1-modules==0.3.0
+PyJWT==2.6.0
+python-dateutil==2.8.2
+pytz==2022.7.1
+requests==2.30.0
+rsa==4.9
+s3transfer==0.6.1
+six==1.16.0
+sqlparse==0.4.3
+tzdata==2022.7
+urllib3==1.26.15
+
 

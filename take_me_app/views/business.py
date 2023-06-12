@@ -189,8 +189,11 @@ class BusinessViewSet(mixins.CreateModelMixin,
 def anonymous_user_random():
     business_list = Business.objects.all()
     num = random.randint(0, len(business_list)-1)
-    serializer = BusinessSerializer(instance=business_list[num], many=False)
-    return Response(serializer.data)
+    # serializer = BusinessSerializer(instance=business_list[num], many=False)
+    # return Response(serializer.data)
+    return Response(data={
+        'business_id': business_list[num].id
+    })
 
 
 @api_view(['GET'])
@@ -204,8 +207,11 @@ def get_choose_me_business(request):
         print(request.user.first_name)
         business_list = Business.objects.all()
         num = random.randint(0, len(business_list)-1)
-        serializer = BusinessSerializer(instance=business_list[num], many=False)
-        return Response(serializer.data)
+        # serializer = BusinessSerializer(instance=business_list[num], many=False)
+        # return Response(serializer.data)
+        return Response(data={
+            'business_id': business_list[num].id
+        })
     pass
 
 
@@ -217,8 +223,11 @@ def get_challenge_me_business(request):
     else:
         business_list = Business.objects.all()
         num = random.randint(0, len(business_list)-1)
-        serializer = BusinessSerializer(instance=business_list[num], many=False)
-        return Response(serializer.data)
+        # serializer = BusinessSerializer(instance=business_list[num], many=False)
+        # return Response(serializer.data)
+        return Response(data={
+            'business_id': business_list[num].id
+        })
     pass
 
 

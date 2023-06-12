@@ -25,12 +25,13 @@ class BusinessSerializer(serializers.ModelSerializer):
     # challenge_set = serializers.PrimaryKeyRelatedField(many=True,
     #                                                 queryset=Challenge.objects.filter(is_business_challenge=True))
     challenges = serializers.SerializerMethodField('get_challenges')
+    user_id = serializers.SerializerMethodField('get_user_id')
 
     class Meta:
         model = Business
         fields = ('id', 'name', 'description', 'phone_num', 'menu_url', 'logo', 'cover', 'load_hour', 'user_name',
-                  'address', 'views_num', 'accessibilities', 'opening_hours', 'business_types', 'business_address',
-                  'challenges')
+                  'user_id', 'address', 'views_num', 'accessibilities', 'opening_hours', 'business_types',
+                  'business_address', 'challenges')
         depth = 1
 
     @staticmethod
@@ -40,11 +41,17 @@ class BusinessSerializer(serializers.ModelSerializer):
         return b[0][0] + " " + b[0][1]
 
     @staticmethod
+    def get_user_id(obj):
+        b = Business.objects.filter(id=obj.id).values_list('businessanduser__user__id')
+        return b[0][0]
+
+    @staticmethod
     def get_address(obj):
         address = Address.objects.get(business_id=obj.id)
         return f"{address.city}, {address.street} {address.number}"
 
-    def get_challenges(self, obj):
+    @staticmethod
+    def get_challenges(obj):
         business_challenges = obj.challenge_set.filter(is_business_challenge=True)
         serializer = ChallengeSerializer(business_challenges, many=True)
         return serializer.data

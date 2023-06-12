@@ -67,6 +67,8 @@ class Business(models.Model):
     users_histories = models.ManyToManyField(User, through='UserViewHistory', related_name='business_histories')
     users_likes = models.ManyToManyField(User, through='UserLike', related_name='business_likes')
 
+    # TODO: add facebook, and insta.
+
     # addres_id
     # opening_hours
 
