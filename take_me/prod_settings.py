@@ -30,7 +30,7 @@ SECRET_KEY = database_log['KEY_DJANGO_TAKE_ME']['SECRET_KEY']
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'ec2-54-159-154-39.compute-1.amazonaws.com']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'ec2-18-207-215-29.compute-1.amazonaws.com', ]
 
 
 # Application definition
